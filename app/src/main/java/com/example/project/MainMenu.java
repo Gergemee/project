@@ -1,6 +1,8 @@
 package com.example.project;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,5 +16,14 @@ public class MainMenu extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
+    }
+
+    public void onclick(View v) {
+        Intent i = new Intent(MainMenu.this, MainMenu2.class);
+        startActivity(i);
+    }
+    public void onclick1(View v) {
+        Intent i = new Intent(MainMenu.this, MainMenu3.class);
+        startActivity(i);
     }
 }
