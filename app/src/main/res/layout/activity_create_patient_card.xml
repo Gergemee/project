@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CreatePatientCard">
+
+    <LinearLayout
+        android:layout_width="409dp"
+        android:layout_height="864dp"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:padding="20px"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="266dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:text="Создание карты пациента"
+                android:textColor="#000000"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/button20"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:text="Пропустить" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20px"
+            android:text="Без карты пациента вы не сможете заказать анализы."
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textView13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20px"
+            android:text="В картах пациентов будут храниться результаты анализов вас и ваших близких."
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editTextText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Фамилия"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/editTextText2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20px"
+            android:ems="10"
+            android:hint="Имя"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/editTextText8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20px"
+            android:ems="10"
+            android:hint="Отчество"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/editTextDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20px"
+            android:ems="10"
+            android:hint="Дата рождения"
+            android:inputType="date" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20px"
+            android:dropDownWidth="wrap_content"
+            android:padding="20px"
+            android:spinnerMode="dropdown" />
+
+        <Button
+            android:id="@+id/button21"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20px"
+            android:text="Создать" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

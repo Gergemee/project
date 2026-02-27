@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    tools:context=".LogSignIn2">
+
+    <LinearLayout
+        android:layout_width="412dp"
+        android:layout_height="916dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="63dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#E7E7E7"
+            android:text="👈"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="100dp"
+            android:layout_marginTop="184dp"
+            android:text="Введите код из E-mail"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="99dp"
+            android:orientation="horizontal"
+            android:padding="30dp">
+
+            <EditText
+                android:id="@+id/editTextText4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="text"
+                android:maxLength="1"
+                android:numeric="integer"
+                android:padding="25dp"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/editTextText5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="text"
+                android:maxLength="1"
+                android:numeric="integer"
+                android:padding="25dp" />
+
+            <EditText
+                android:id="@+id/editTextText7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="text"
+                android:maxLength="1"
+                android:numeric="integer"
+                android:padding="25dp" />
+
+            <EditText
+                android:id="@+id/editTextText6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="text"
+                android:maxLength="1"
+                android:numeric="integer"
+                android:padding="25dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="265dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="30dp"
+            android:text="Отпарвить код повторно можно будет через минуту" />
+
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="100dp"
+            android:layout_marginTop="130dp"
+            android:text="Отправить код повторно" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

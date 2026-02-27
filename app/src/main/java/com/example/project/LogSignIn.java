@@ -10,20 +10,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainMenu3 extends AppCompatActivity {
+public class LogSignIn extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_menu3);
+        setContentView(R.layout.activity_log_sign_in);
     }
-
     public void onclick(View v) {
-        Intent i = new Intent(MainMenu3.this, LogSignIn.class);
-        startActivity(i);
-    }
-    public void onclick1(View v) {
-        Intent i = new Intent(MainMenu3.this, LogSignIn.class);
+        Intent i = new Intent(LogSignIn.this, LogSignIn2.class);
         startActivity(i);
     }
 }

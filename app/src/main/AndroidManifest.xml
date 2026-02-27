@@ -12,6 +12,30 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
+            android:name=".Primary4"
+            android:exported="false" />
+        <activity
+            android:name=".Primary3"
+            android:exported="false" />
+        <activity
+            android:name=".Primary2"
+            android:exported="false" />
+        <activity
+            android:name=".Primary"
+            android:exported="false" />
+        <activity
+            android:name=".CreatePatientCard"
+            android:exported="false" />
+        <activity
+            android:name=".PasswordCode"
+            android:exported="false" />
+        <activity
+            android:name=".LogSignIn2"
+            android:exported="false" />
+        <activity
+            android:name=".LogSignIn"
+            android:exported="false" />
+        <activity
             android:name=".MainMenu3"
             android:exported="false" />
         <activity

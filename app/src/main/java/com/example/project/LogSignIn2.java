@@ -11,23 +11,33 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity {
+public class LogSignIn2 extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.activity_log_sign_in2);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent i = new Intent(MainActivity.this, MainMenu.class);
+                Intent i = new Intent(LogSignIn2.this, PasswordCode.class);
                 startActivity(i);
             }
         }, 2000);
+
     }
-//    public void onclick(View v) {
-//        Intent i = new Intent(MainActivity.this, MainMenu.class);
-//        startActivity(i);
-//    }
+
+    public void onwrite() {
+    new Handler().postDelayed(new Runnable() {
+        @Override
+        public void run() {
+            Intent i = new Intent(LogSignIn2.this, PasswordCode.class);
+            startActivity(i);
+        }
+    }, 2000);
+    }
+    public void onclick(View v) {
+        Intent i = new Intent(LogSignIn2.this, PasswordCode.class);
+        startActivity(i);
+    }
 }
