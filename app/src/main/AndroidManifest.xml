@@ -12,6 +12,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
+            android:name=".CardProduct"
+            android:exported="false" />
+        <activity
+            android:name=".CartProductActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreatePasswordCodeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PasswordCreateActivity"
+            android:exported="false" />
+        <activity
             android:name=".PrimaryMain4Activity"
             android:exported="false" />
         <activity
@@ -19,9 +31,6 @@
             android:exported="false" />
         <activity
             android:name=".PrimaryMain2Activity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity2"
             android:exported="false" />
         <activity
             android:name=".Primary3ProjectsCreateActivity"
@@ -33,9 +42,6 @@
             android:name=".Primary3"
             android:exported="false" />
         <activity
-            android:name=".Primary2"
-            android:exported="false" />
-        <activity
             android:name=".Primary"
             android:exported="false" />
         <activity
@@ -45,19 +51,7 @@
             android:name=".PasswordCode"
             android:exported="false" />
         <activity
-            android:name=".LogSignIn2"
-            android:exported="false" />
-        <activity
             android:name=".LogSignIn"
-            android:exported="false" />
-        <activity
-            android:name=".MainMenu3"
-            android:exported="false" />
-        <activity
-            android:name=".MainMenu2"
-            android:exported="false" />
-        <activity
-            android:name=".MainMenu"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

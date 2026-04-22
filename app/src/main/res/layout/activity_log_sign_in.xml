@@ -46,7 +46,7 @@
             android:text="Вход по E-mail" />
 
         <EditText
-            android:id="@+id/editTextText3"
+            android:id="@+id/et_email"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="center"
@@ -66,7 +66,7 @@
             android:text="Пароль" />
 
         <EditText
-            android:id="@+id/editTextTextPassword"
+            android:id="@+id/et_password"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@drawable/input_text"
@@ -77,7 +77,7 @@
             android:paddingEnd="16dp" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/but_login"
             style="@style/Widget.AppCompat.Button"
             android:layout_width="338dp"
             android:layout_height="59dp"
@@ -95,6 +95,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
+            android:onClick="onclick1"
             android:text="Зарегистрироваться"
             android:textColor="#08569E" />
 
@@ -112,24 +113,26 @@
                 android:text="Или войдите с помощью" />
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/btnvk"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
                 android:backgroundTint="#FFFFFF"
                 android:drawableStart="@drawable/vklogo"
+                android:onClick="onclick"
                 android:shadowColor="@color/white"
                 android:text="Войти с ВКонтакте" />
 
             <Button
-                android:id="@+id/button4"
+                android:id="@+id/btnyan"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:backgroundTint="#FFFFFF"
                 android:drawableStart="@drawable/yandexlogo"
+                android:onClick="onclick"
                 android:shadowColor="@color/white"
                 android:text="Войти с Яндекс" />
         </LinearLayout>

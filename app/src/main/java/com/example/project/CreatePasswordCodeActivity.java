@@ -1,15 +1,19 @@
 package com.example.project;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
-public class PasswordCode extends AppCompatActivity {
+public class CreatePasswordCodeActivity extends AppCompatActivity {
+
     private StringBuilder pinCode = new StringBuilder(); // Хранит введенные цифры
     private View[] dots = new View[4]; // Массив для кружочков-индикаторов
     private final int PIN_LENGTH = 4;
@@ -17,7 +21,8 @@ public class PasswordCode extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_password_code);
+        setContentView(R.layout.activity_create_password_code);
+
         // Привязываем кружочки
         dots[0] = findViewById(R.id.dot1);
         dots[1] = findViewById(R.id.dot2);
@@ -72,38 +77,14 @@ public class PasswordCode extends AppCompatActivity {
         }
     }
     private void verifyPin() {
-        String enteredPin = pinCode.toString();
-        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        String savedPin = prefs.getString("user_pin", "");
+        String finalPin = pinCode.toString();
 
-        if (savedPin.isEmpty()) {
-            // Если пина еще нет — сохраняем его (первая установка)
-            prefs.edit().putString("user_pin", enteredPin).apply();
-            proceedToDashboard();
-        } else {
-            // Если пин есть — проверяем на совпадение
-            if (enteredPin.equals(savedPin)) {
-                proceedToDashboard();
-            } else {
-                Toast.makeText(this, "Неверный ПИН-код", Toast.LENGTH_SHORT).show();
-                pinCode.setLength(0); // Очищаем введенное
-                updateDots();         // Сбрасываем кружочки
-            }
-        }
-    }
-    private void proceedToDashboard() {
-        // 1. Создаем намерение для перехода на главный экран
-        Intent intent = new Intent(this, Primary.class);
+        // В учебном проекте просто сохраняем в переменную или SharedPreferences
+        Toast.makeText(this, "Пин-код установлен: " + finalPin, Toast.LENGTH_SHORT).show();
 
-        // 2. Очищаем стек Activity.
-        // Это нужно, чтобы при нажатии кнопки "Назад" пользователь
-        // не вернулся на экран ввода ПИН-кода или логина.
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        // 3. Запускаем переход
+        // Переход на главный экран (Dashboard)
+        Intent intent = new Intent(this, LogSignIn.class);
         startActivity(intent);
-
-        // 4. Закрываем текущий экран ПИН-кода
         finish();
     }
 }

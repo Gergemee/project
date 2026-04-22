@@ -45,7 +45,7 @@
                 android:textStyle="bold" />
 
             <Button
-                android:id="@+id/button5"
+                android:id="@+id/btn_add_project"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="right"
@@ -63,7 +63,8 @@
             android:layout_marginTop="50dp"
             android:background="@drawable/borders"
             android:orientation="vertical"
-            android:padding="5dp">
+            android:padding="5dp"
+            android:id="@+id/your_card_id">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -71,7 +72,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textView19"
+                    android:id="@+id/your_text_view_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -131,7 +132,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/nav_home"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
             android:layout_weight="1"
@@ -139,7 +140,7 @@
             app:srcCompat="@drawable/main_bar_unactive" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/nav_catalog"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
             android:layout_weight="1"
@@ -147,7 +148,7 @@
             app:srcCompat="@drawable/catalog_bar_unactive" />
 
         <ImageButton
-            android:id="@+id/imageButton3"
+            android:id="@+id/nav_projects"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
             android:layout_weight="1"
@@ -155,7 +156,7 @@
             app:srcCompat="@drawable/project_bar_active" />
 
         <ImageButton
-            android:id="@+id/imageButton4"
+            android:id="@+id/nav_profile"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
             android:layout_weight="1"

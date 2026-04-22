@@ -26,8 +26,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 2000);
     }
-//    public void onclick(View v) {
-//        Intent i = new Intent(MainActivity.this, MainMenu.class);
-//        startActivity(i);
-//    }
 }

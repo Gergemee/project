@@ -266,23 +266,23 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/nav_home"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
             android:layout_weight="1"
             android:background="#FFFFFF"
-            app:srcCompat="@drawable/main_bar_unactive" />
+            app:srcCompat="@drawable/main_bar_active" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/nav_catalog"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
             android:layout_weight="1"
             android:background="#FFFFFF"
-            app:srcCompat="@drawable/catalog_bar_active" />
+            app:srcCompat="@drawable/catalog_bar_unactive" />
 
         <ImageButton
-            android:id="@+id/imageButton3"
+            android:id="@+id/nav_projects"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
             android:layout_weight="1"
@@ -290,7 +290,7 @@
             app:srcCompat="@drawable/project_bar_unactive" />
 
         <ImageButton
-            android:id="@+id/imageButton4"
+            android:id="@+id/nav_profile"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
             android:layout_weight="1"
