@@ -4,12 +4,11 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class Primary2 extends AppCompatActivity {
+public class Primary3ProjectsCreateActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_primary2_catalog);
-
+        setContentView(R.layout.activity_primary3_projects_create);
     }
 }
