@@ -41,4 +41,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    // Retrofit — основная библиотека
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+// Конвертер Gson для Retrofit (превращает JSON в объекты)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+// OkHttp и логирование запросов
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+// Сама библиотека Gson
+    implementation("com.google.code.gson:gson:2.10.1")
 }

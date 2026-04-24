@@ -5,18 +5,30 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.JsonObject;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class Primary3ProjectsCreateActivity extends AppCompatActivity {
 
-    private EditText etType, etProjectName, etStartDate, etEndDate, etTarget, etSource, etCategory;
+    private EditText etProjectName, etStartDate, etEndDate, etSource;
     private Button btnConfirm;
-
+    private Spinner etType, etTarget, etCategory;
+    private APIService apiService;
+    private String userToken;
 
     @SuppressLint({"MissingInflatedId", "WrongViewCast"})
     @Override
@@ -24,80 +36,116 @@ public class Primary3ProjectsCreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_primary3_projects_create);
 
-        // Инициализация всех полей
-        etType = findViewById(R.id.et_type); // Item 1
+        apiService = APIClient.getApiService();
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        userToken = "Bearer " + prefs.getString("auth_token", "");
+
+        etType = findViewById(R.id.et_type);
         etProjectName = findViewById(R.id.et_project_name);
         etStartDate = findViewById(R.id.et_start_date);
         etEndDate = findViewById(R.id.et_end_date);
-        etTarget = findViewById(R.id.et_target); // Item 1 (Кому)
-        etSource = findViewById(R.id.et_source); // example.com
-        etCategory = findViewById(R.id.et_category); // Item 1 (Категория)
-
+        etTarget = findViewById(R.id.et_target);
+        etSource = findViewById(R.id.et_source);
+        etCategory = findViewById(R.id.et_category);
         btnConfirm = findViewById(R.id.btn_confirm);
 
-        // Слушатель кнопки подтверждения
-        btnConfirm.setOnClickListener(v -> {
-            saveAndReturn();
-        });
+        setupSpinners();
+
+        btnConfirm.setOnClickListener(v -> saveAndReturn());
         setupBottomNavigation();
     }
+
+    private void setupSpinners() {
+        String[] types = {"Верхняя одежда", "Футболки и топы", "Брюки и джинсы", "Аксессуары", "Обувь"};
+        setupSingleSpinner(etType, types);
+
+        String[] targets = {"Мужчинам", "Женщинам", "Детям (Унисекс)", "Новорожденным"};
+        setupSingleSpinner(etTarget, targets);
+
+        String[] categories = {"Повседневная (Casual)", "Спортивная", "Деловая", "Вечерняя мода", "Летняя коллекция"};
+        setupSingleSpinner(etCategory, categories);
+    }
+
+    private void setupSingleSpinner(Spinner spinner, String[] data) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, data);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
     private void saveAndReturn() {
         String name = etProjectName.getText().toString().trim();
-        String type = etType.getText().toString().trim();
+        String type = etType.getSelectedItem().toString();
+        String start = etStartDate.getText().toString().trim();
+        String end = etEndDate.getText().toString().trim();
+        String source = etSource.getText().toString().trim();
+        String target = etTarget.getSelectedItem().toString();
 
         if (name.isEmpty()) {
             etProjectName.setError("Введите название проекта");
             return;
         }
 
-        // Сохраняем данные нового проекта в память
-        SharedPreferences prefs = getSharedPreferences("ProjectPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
+        RequestBody rbTitle = RequestBody.create(MediaType.parse("text/plain"), name);
+        RequestBody rbType = RequestBody.create(MediaType.parse("text/plain"), type);
+        RequestBody rbStart = RequestBody.create(MediaType.parse("text/plain"), start);
+        RequestBody rbEnd = RequestBody.create(MediaType.parse("text/plain"), end);
+        RequestBody rbSize = RequestBody.create(MediaType.parse("text/plain"), target);
+        RequestBody rbSource = RequestBody.create(MediaType.parse("text/plain"), source);
 
-        // Для учебного проекта сохраним хотя бы название и дату
-        editor.putString("last_project_name", name);
-        editor.putString("last_project_date", "Только что");
-        editor.putBoolean("has_new_project", true); // Флаг, что проект создан
-        editor.apply();
+        String userId = getSharedPreferences("UserPrefs", MODE_PRIVATE).getString("user_id", "");
+        RequestBody rbUser = RequestBody.create(MediaType.parse("text/plain"), userId);
 
-        Toast.makeText(this, "Проект создан!", Toast.LENGTH_SHORT).show();
+        MultipartBody.Part filePart = null;
 
-        // Закрываем страницу и возвращаемся к списку
-        finish();
+        apiService.createProject(
+                userToken,
+                rbTitle,
+                rbType,
+                rbStart,
+                rbEnd,
+                rbSize,
+                rbSource,
+                filePart,
+                rbUser
+        ).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(Primary3ProjectsCreateActivity.this, "Проект успешно создан!", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(Primary3ProjectsCreateActivity.this, "Ошибка: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(Primary3ProjectsCreateActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
     private void setupBottomNavigation() {
         View btnHome = findViewById(R.id.nav_home);
         View btnCatalog = findViewById(R.id.nav_catalog);
         View btnProjects = findViewById(R.id.nav_projects);
         View btnProfile = findViewById(R.id.nav_profile);
 
-        // Метод для запуска Activity с защитой от дублирования
         View.OnClickListener navListener = v -> {
             Intent intent;
             int id = v.getId();
+            if (id == R.id.nav_projects) return;
 
-            if (id == R.id.nav_projects) {
-                // Если мы уже на главной, ничего не делаем
-                return;
-            } else if (id == R.id.nav_catalog) {
-                intent = new Intent(this, PrimaryMain2Activity.class);
-            } else if (id == R.id.nav_home) {
-                intent = new Intent(this, Primary.class);
-            } else if (id == R.id.nav_profile) {
-                intent = new Intent(this, Primary4.class);
-            } else {
-                return;
-            }
+            if (id == R.id.nav_catalog) intent = new Intent(this, PrimaryMain2Activity.class);
+            else if (id == R.id.nav_home) intent = new Intent(this, Primary.class);
+            else if (id == R.id.nav_profile) intent = new Intent(this, Primary4.class);
+            else return;
 
-            // Этот флаг не создает новую Activity, если она уже открыта
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
-
-            // Убираем анимацию, чтобы переход казался мгновенным, как в настоящем меню
             overridePendingTransition(0, 0);
         };
 
-        // Присваиваем один лисенер всем кнопкам
         btnHome.setOnClickListener(navListener);
         btnCatalog.setOnClickListener(navListener);
         btnProjects.setOnClickListener(navListener);

@@ -1,6 +1,7 @@
 package com.example.project;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,14 +12,21 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.JsonObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class PasswordCreateActivity extends AppCompatActivity {
 
-    // Переменные для хранения данных с предыдущего экрана
     private String firstName, middleName, lastName, birthDate, gender, email;
-
-    private EditText etNewPassword;
-    private EditText etConfirmPassword;
+    private EditText etNewPassword, etConfirmPassword;
     private Button btnSave;
+
+    private APIService apiService;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -26,7 +34,8 @@ public class PasswordCreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_password_create);
 
-        // Извлекаем все данные из Intent
+        apiService = APIClient.getApiService();
+
         firstName = getIntent().getStringExtra("first_name");
         middleName = getIntent().getStringExtra("middle_name");
         lastName = getIntent().getStringExtra("last_name");
@@ -34,53 +43,91 @@ public class PasswordCreateActivity extends AppCompatActivity {
         gender = getIntent().getStringExtra("gender");
         email = getIntent().getStringExtra("email");
 
-        // Теперь эти переменные доступны в этом классе.
-        // Вы можете, например, вывести приветствие: "Иван, придумайте пароль"
         etNewPassword = findViewById(R.id.new_password);
         etConfirmPassword = findViewById(R.id.confirm_password);
         btnSave = findViewById(R.id.btnsave);
 
-        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
+        btnSave.setEnabled(false);
+        btnSave.setAlpha(0.5f);
 
-        editor.putString("registered_email", email);       // email мы получили из Intent ранее
-        editor.putString("registered_password", String.valueOf(etNewPassword)); // текущий введенный пароль
-        editor.apply();
+        setupListeners();
 
-        Toast.makeText(this, "Регистрация завершена!", Toast.LENGTH_SHORT).show();
+        btnSave.setOnClickListener(v -> registerUserOnServer());
+    }
 
-        TextWatcher passwordWatcher = new TextWatcher() {
+    private void registerUserOnServer() {
+        String finalPassword = etNewPassword.getText().toString();
+
+        JsonObject body = new JsonObject();
+        body.addProperty("email", email);
+        body.addProperty("password", finalPassword);
+        body.addProperty("passwordConfirm", finalPassword);
+        body.addProperty("firstName", firstName);
+        body.addProperty("middleName", middleName);
+        body.addProperty("lastName", lastName);
+        body.addProperty("birthDate", birthDate);
+        body.addProperty("gender", gender);
+
+        btnSave.setEnabled(false);
+        btnSave.setText("Регистрация...");
+
+        apiService.registerUser(body).enqueue(new Callback<JsonObject>() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    saveUserDataLocally(email, firstName);
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                checkPasswords(); // Вызываем нашу проверку
+                    Toast.makeText(PasswordCreateActivity.this, "Успешная регистрация!", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(PasswordCreateActivity.this, CreatePasswordCodeActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    btnSave.setEnabled(true);
+                    btnSave.setText("Сохранить");
+                    Toast.makeText(PasswordCreateActivity.this, "Ошибка: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                btnSave.setEnabled(true);
+                btnSave.setText("Сохранить");
+                Toast.makeText(PasswordCreateActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void saveUserDataLocally(String email, String name) {
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("current_user_email", email);
+        editor.putString("current_user_name", name);
+        editor.apply();
+    }
+
+    private void setupListeners() {
+        TextWatcher passwordWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkPasswords();
+            }
+            @Override
             public void afterTextChanged(Editable s) {}
         };
-
         etNewPassword.addTextChangedListener(passwordWatcher);
         etConfirmPassword.addTextChangedListener(passwordWatcher);
     }
+
     private void checkPasswords() {
         String pass = etNewPassword.getText().toString();
         String confirmPass = etConfirmPassword.getText().toString();
+        boolean valid = !pass.isEmpty() && pass.equals(confirmPass) && pass.length() >= 8;
 
-        // Проверяем: не пусты ли поля и равны ли они друг другу
-        boolean isMatching = !pass.isEmpty() && pass.equals(confirmPass);
-
-        // Дополнительно: проверка на минимальную длину (например, 8 символов)
-        boolean isLongEnough = pass.length() >= 8;
-
-        if (isMatching && isLongEnough) {
-            btnSave.setEnabled(true);
-            btnSave.setAlpha(1.0f);
-        } else {
-            btnSave.setEnabled(false);
-            btnSave.setAlpha(0.5f);
-        }
+        btnSave.setEnabled(valid);
+        btnSave.setAlpha(valid ? 1.0f : 0.5f);
     }
 }

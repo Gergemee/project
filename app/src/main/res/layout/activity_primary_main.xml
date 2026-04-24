@@ -148,7 +148,7 @@
                 android:layout_marginTop="16dp"
                 android:orientation="horizontal">
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/btnFilterAll"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
@@ -160,7 +160,7 @@
                     android:textSize="13sp"
                     app:backgroundTint="@null" />
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/btnFilterWomen"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
@@ -174,7 +174,7 @@
                     android:textSize="13sp"
                     app:backgroundTint="@null" />
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/btnFilterMen"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
@@ -207,7 +207,7 @@
                 android:layout_marginBottom="16dp"
                 android:orientation="vertical" />
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>>
 
     <LinearLayout
         android:id="@+id/homeCartBar"

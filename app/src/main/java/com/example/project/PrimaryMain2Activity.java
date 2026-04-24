@@ -1,201 +1,204 @@
 package com.example.project;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PrimaryMain2Activity extends AppCompatActivity {
 
-    private View layoutCart; // Сама панель "В корзину"
-    private TextView tvCartPrice; // Текст с ценой (500 Р)
+    private View layoutCart;
+    private TextView tvCartPrice;
     private int totalPrice = 0;
+    private LinearLayout layoutCatalog;
+    private APIService apiService;
+    private String userToken;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_primary_main2); // ваш XML
+        setContentView(R.layout.activity_primary_main2);
 
-        // 1. Инициализируем панель корзины
-        layoutCart = findViewById(R.id.layout_cart_panel);
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        userToken = "Bearer " + prefs.getString("auth_token", "");
+        userId = prefs.getString("user_id", "");
 
+        apiService = APIClient.getApiService();
+
+        layoutCatalog = findViewById(R.id.containercards);
+        layoutCart = findViewById(R.id.cartlayout);
         tvCartPrice = findViewById(R.id.tv_cart_total_price);
 
-        // По умолчанию скрываем корзину
-        layoutCart.setVisibility(View.GONE);
-
-        // 2. Настраиваем кнопки-фильтры (Все, Женщинам, Мужчинам)
-        setupCategoryButtons();
-
-        // 3. Запускаем навигацию
-        setupBottomNavigation();
-        layoutCart.setOnClickListener(v -> {
-            Intent intent = new Intent(this, PrimaryMain3Activity.class);
-            intent.putExtra("TOTAL_SUM", totalPrice);
-            intent.putExtra("ADD_ITEM_1", true);
-            intent.putExtra("ADD_ITEM_2", false);
-            startActivity(intent);
-        });
-        addProductToCatalog("Рубашка Воскресенье", "Мужская одежда", 300, "Описание рубашки...");
-        addProductToCatalog("Шорты Вторник", "Мужская одежда", 500, "Описание шорт...");
-    }
-    private void setupCategoryButtons() {
-        View btnAll = findViewById(R.id.btn_filter_all);
-        View btnWomen = findViewById(R.id.btn_filter_women);
-        View btnMen = findViewById(R.id.btn_filter_men);
-
-        View.OnClickListener filterListener = v -> {
-            // Сбрасываем все в полупрозрачный вид
-            btnAll.setAlpha(0.5f);
-            btnWomen.setAlpha(0.5f);
-            btnMen.setAlpha(0.5f);
-
-            // Подсвечиваем нажатую кнопку
-            v.setAlpha(1.0f);
-
-            // Здесь в будущем будет логика фильтрации списка
-            Toast.makeText(this, "Фильтр активирован", Toast.LENGTH_SHORT).show();
-        };
-
-        btnAll.setOnClickListener(filterListener);
-        btnWomen.setOnClickListener(filterListener);
-        btnMen.setOnClickListener(filterListener);
-    }
-    public void onProductClick(int price) {
-        totalPrice += price;
-
-        // Обновляем текст на кнопке
-        tvCartPrice.setText(totalPrice + " ₽");
-
-        // Если сумма > 0, показываем панель
-        if (totalPrice > 0) {
-            layoutCart.setVisibility(View.VISIBLE);
-            // Можно добавить анимацию появления
-            layoutCart.setAlpha(0f);
-            layoutCart.animate().alpha(1f).setDuration(300).start();
+        if (layoutCart != null) {
+            layoutCart.setOnClickListener(v -> {
+                Intent intent = new Intent(this, PrimaryMain3Activity.class);
+                startActivity(intent);
+            });
+            layoutCart.setVisibility(View.GONE);
         }
+
+        loadProductsFromServer();
+        setupBottomNavigation();
     }
-    private void setupBottomNavigation() {
-        View btnHome = findViewById(R.id.nav_home);
-        View btnCatalog = findViewById(R.id.nav_catalog);
-        View btnProjects = findViewById(R.id.nav_projects);
-        View btnProfile = findViewById(R.id.nav_profile);
 
-        // Метод для запуска Activity с защитой от дублирования
-        View.OnClickListener navListener = v -> {
-            Intent intent;
-            int id = v.getId();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadCartTotal();
+    }
 
-            if (id == R.id.nav_catalog) {
-                // Если мы уже на главной, ничего не делаем
-                return;
-            } else if (id == R.id.nav_profile) {
-                intent = new Intent(this, PrimaryMain4Activity.class);
-            } else if (id == R.id.nav_projects) {
-                intent = new Intent(this, Primary3.class);
-            } else if (id == R.id.nav_home) {
-                intent = new Intent(this, Primary.class);
-            } else {
-                return;
+    private void loadCartTotal() {
+        apiService.getBasket(userToken).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    JsonObject root = response.body();
+                    JsonArray records = root.has("items") ? root.getAsJsonArray("items") : new JsonArray();
+
+                    totalPrice = 0;
+
+                    for (JsonElement recordElement : records) {
+                        JsonObject record = recordElement.getAsJsonObject();
+
+                        if (record.has("items") && record.get("items").isJsonArray()) {
+                            JsonArray productItems = record.getAsJsonArray("items");
+
+                            for (JsonElement productElement : productItems) {
+                                JsonObject product = productElement.getAsJsonObject();
+
+                                int price = 0;
+                                if (product.has("price") && !product.get("price").isJsonNull()) {
+                                    price = product.get("price").getAsInt();
+                                }
+
+                                int qty = 0;
+                                if (product.has("quantity") && !product.get("quantity").isJsonNull()) {
+                                    qty = product.get("quantity").getAsInt();
+                                }
+
+                                totalPrice += (price * qty);
+                            }
+                        }
+                    }
+                    updateCartUI();
+                }
             }
 
-            // Этот флаг не создает новую Activity, если она уже открыта
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-
-            // Убираем анимацию, чтобы переход казался мгновенным, как в настоящем меню
-            overridePendingTransition(0, 0);
-        };
-
-        // Присваиваем один лисенер всем кнопкам
-        btnHome.setOnClickListener(navListener);
-        btnCatalog.setOnClickListener(navListener);
-        btnProjects.setOnClickListener(navListener);
-        btnProfile.setOnClickListener(navListener);
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e("API_ERROR", "Ошибка загрузки суммы: " + t.getMessage());
+            }
+        });
     }
-    @SuppressLint("MissingInflatedId")
+
+    private void updateCartUI() {
+        if (layoutCart == null) return;
+        if (totalPrice > 0) {
+            if (tvCartPrice != null) tvCartPrice.setText(totalPrice + " ₽");
+            layoutCart.setVisibility(View.VISIBLE);
+        } else {
+            layoutCart.setVisibility(View.GONE);
+        }
+    }
+
+    private void sendProductToBasket(String title, int price) {
+        JsonArray itemsArray = new JsonArray();
+        JsonObject productItem = new JsonObject();
+        productItem.addProperty("title", title);
+        productItem.addProperty("price", price);
+        productItem.addProperty("quantity", 1);
+        productItem.addProperty("product_id", "some_id");
+        itemsArray.add(productItem);
+
+        JsonObject body = new JsonObject();
+        body.addProperty("user_id", userId);
+        body.add("items", itemsArray);
+        body.addProperty("count", 1);
+
+        apiService.createBasket(userToken, body).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(PrimaryMain2Activity.this, "Добавлено!", Toast.LENGTH_SHORT).show();
+                    loadCartTotal();
+                }
+            }
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e("API_ERROR", "Ошибка добавления: " + t.getMessage());
+            }
+        });
+    }
+
+    private void loadProductsFromServer() {
+        apiService.getProducts(userToken, 50, "-created").enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    JsonArray items = response.body().getAsJsonArray("items");
+                    if (items != null) {
+                        layoutCatalog.removeAllViews();
+                        for (JsonElement element : items) {
+                            JsonObject obj = element.getAsJsonObject();
+                            String title = obj.has("title") ? obj.get("title").getAsString() : "Товар";
+                            int price = obj.has("price") && !obj.get("price").isJsonNull() ? obj.get("price").getAsInt() : 0;
+                            addProductToCatalog(title, price, obj.has("description") ? obj.get("description").getAsString() : "");
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {}
+        });
+    }
+
+    private void addProductToCatalog(String name, int price, String description) {
+        View itemView = LayoutInflater.from(this).inflate(R.layout.activity_card_product, layoutCatalog, false);
+        ((TextView) itemView.findViewById(R.id.tvProductTitle)).setText(name);
+        ((TextView) itemView.findViewById(R.id.tvProductPrice)).setText(price + " ₽");
+
+        itemView.setOnClickListener(v -> showProductDetails(name, description, price));
+        itemView.findViewById(R.id.btnProductAction).setOnClickListener(v -> sendProductToBasket(name, price));
+
+        layoutCatalog.addView(itemView);
+    }
+
     private void showProductDetails(String title, String description, int price) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-        View bottomSheetView = LayoutInflater.from(this).inflate(R.layout.activity_primary_main4, null);
-        bottomSheetDialog.setContentView(bottomSheetView);
-
-        // НАХОДИМ ЭЛЕМЕНТЫ
-        TextView tvTitle = bottomSheetView.findViewById(R.id.tv_product_title);
-        TextView tvDescription = bottomSheetView.findViewById(R.id.tv_product_description);
-        Button btnAdd = bottomSheetView.findViewById(R.id.btn_add_to_cart);
-
-        // УСТАНАВЛИВАЕМ ДАННЫЕ
-        tvTitle.setText(title);
-        tvDescription.setText(description);
-        btnAdd.setText("Добавить за " + price + " ₽");
-
-        // ЛОГИКА НАЖАТИЯ
-        btnAdd.setOnClickListener(v -> {
-            onProductAddedToCart(price); // Вызываем наш метод
+        View view = LayoutInflater.from(this).inflate(R.layout.activity_primary_main4, null);
+        bottomSheetDialog.setContentView(view);
+        ((TextView) view.findViewById(R.id.tv_product_title)).setText(title);
+        ((TextView) view.findViewById(R.id.tv_product_description)).setText(description);
+        Button btn = view.findViewById(R.id.btn_add_to_cart);
+        btn.setText("Добавить за " + price + " ₽");
+        btn.setOnClickListener(v -> {
+            sendProductToBasket(title, price);
             bottomSheetDialog.dismiss();
         });
-
         bottomSheetDialog.show();
     }
-    private void onProductAddedToCart(int price) {
-        // 1. Прибавляем цену к общей сумме (переменная totalPrice должна быть в начале класса)
-        totalPrice += price;
 
-        // 2. Обновляем текст на синей плашке
-        tvCartPrice.setText(totalPrice + " ₽");
-
-        // 3. Показываем плашку, если она была скрыта
-        layoutCart.setVisibility(View.VISIBLE);
-    }
-    private void addProductToCatalog(String name, String category, int price, String description) {
-        LinearLayout catalogContainer = findViewById(R.id.containercards); // Контейнер в XML каталога
-        LayoutInflater inflater = LayoutInflater.from(this);
-
-        // 1. Создаем View карточки из шаблона
-        View itemView = inflater.inflate(R.layout.activity_card_product, catalogContainer, false);
-
-        // 2. Находим элементы и заполняем данными
-        TextView tvName = itemView.findViewById(R.id.tvProductTitle);
-        TextView tvCategory = itemView.findViewById(R.id.tvProductCategory);
-        TextView tvPrice = itemView.findViewById(R.id.tvProductPrice);
-        Button btnAdd = itemView.findViewById(R.id.btnProductAction);
-
-        tvName.setText(name);
-        tvCategory.setText(category);
-        tvPrice.setText(price + " ₽");
-
-        // 3. ДЕЙСТВИЕ №1: Нажатие на саму карточку (открываем описание)
-        itemView.setOnClickListener(v -> {
-            // Вызываем метод BottomSheet, который мы создали ранее
-            showProductDetails(name, description, price);
-        });
-
-        // 4. ДЕЙСТВИЕ №2: Нажатие на кнопку "Добавить"
-        btnAdd.setOnClickListener(v -> {
-            // Вызываем метод обновления синей плашки внизу экрана
-            onProductAddedToCart(price);
-
-            // Опционально: можно передать флаг для CartActivity, что товар выбран
-            getIntent().putExtra("ADD_ITEM_1", true);
-
-            Toast.makeText(this, "Добавлено: " + name, Toast.LENGTH_SHORT).show();
-        });
-
-        // 5. Добавляем карточку в список на экране
-        catalogContainer.addView(itemView);
+    private void setupBottomNavigation() {
+        findViewById(R.id.nav_home).setOnClickListener(v -> startActivity(new Intent(this, Primary.class)));
+        findViewById(R.id.nav_projects).setOnClickListener(v -> startActivity(new Intent(this, Primary3.class)));
+        findViewById(R.id.nav_profile).setOnClickListener(v -> startActivity(new Intent(this, Primary4.class)));
     }
 }

@@ -6,13 +6,6 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <ImageView
-        android:id="@+id/btn_close_dialog"
-        android:layout_width="20dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:src="@drawable/icon_cross" />
-
     <TextView
         android:id="@+id/tv_product_title"
         android:layout_width="match_parent"
@@ -57,7 +50,7 @@
         android:layout_marginTop="18dp"
         android:background="@drawable/buttons"
         android:textAllCaps="false"
-        android:text=""
+        android:text="Добавить"
         android:textColor="@color/white"
         app:backgroundTint="@null"/>
 

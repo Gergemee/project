@@ -85,7 +85,6 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/rounded_button_active_auth"
             android:backgroundTint="#51CEF4"
-            android:onClick="onclick"
             android:text="Далее" />
 
         <TextView
@@ -95,7 +94,6 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
-            android:onClick="onclick1"
             android:text="Зарегистрироваться"
             android:textColor="#08569E" />
 
@@ -120,7 +118,6 @@
                 android:layout_marginTop="30dp"
                 android:backgroundTint="#FFFFFF"
                 android:drawableStart="@drawable/vklogo"
-                android:onClick="onclick"
                 android:shadowColor="@color/white"
                 android:text="Войти с ВКонтакте" />
 
@@ -132,7 +129,6 @@
                 android:layout_marginTop="10dp"
                 android:backgroundTint="#FFFFFF"
                 android:drawableStart="@drawable/yandexlogo"
-                android:onClick="onclick"
                 android:shadowColor="@color/white"
                 android:text="Войти с Яндекс" />
         </LinearLayout>

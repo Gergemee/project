@@ -9,58 +9,65 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class PasswordCode extends AppCompatActivity {
-    private StringBuilder pinCode = new StringBuilder(); // Хранит введенные цифры
-    private View[] dots = new View[4]; // Массив для кружочков-индикаторов
+    private StringBuilder pinCode = new StringBuilder();
+    private View[] dots = new View[4];
     private final int PIN_LENGTH = 4;
+
+    private APIService apiService;
+    private String userToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_password_code);
-        // Привязываем кружочки
+
+        apiService = APIClient.getApiService();
+
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        userToken = prefs.getString("auth_token", "");
+
         dots[0] = findViewById(R.id.dot1);
         dots[1] = findViewById(R.id.dot2);
         dots[2] = findViewById(R.id.dot3);
         dots[3] = findViewById(R.id.dot4);
 
-        // Настраиваем кнопки с цифрами (0-9)
         setNumberClickListeners();
 
-        // Настраиваем кнопку удаления (BACK)
         findViewById(R.id.butdelete).setOnClickListener(v -> deleteLastDigit());
     }
+
     private void setNumberClickListeners() {
         View.OnClickListener listener = v -> {
             if (pinCode.length() < PIN_LENGTH) {
                 Button b = (Button) v;
-                pinCode.append(b.getText().toString()); // Добавляем цифру в строку
-                updateDots(); // Обновляем кружочки
+                pinCode.append(b.getText().toString());
+                updateDots();
 
-                // Если ввели 4 цифры — проверяем результат
                 if (pinCode.length() == PIN_LENGTH) {
                     verifyPin();
                 }
             }
         };
 
-        // Привязываем этот лисенер ко всем кнопкам от 0 до 9
         int[] buttonIds = {R.id.button7, R.id.button8, R.id.button9, R.id.button10, R.id.button11,
                 R.id.button12, R.id.button13, R.id.button14, R.id.button15, R.id.button16};
         for (int id : buttonIds) {
             findViewById(id).setOnClickListener(listener);
         }
     }
+
     private void updateDots() {
         for (int i = 0; i < dots.length; i++) {
             if (i < pinCode.length()) {
-                // Кружочек закрашен (введена цифра)
                 dots[i].setBackgroundResource(R.drawable.zakrashkrug);
                 dots[i].setAlpha(1.0f);
             } else {
-                // Кружочек пустой
                 dots[i].setBackgroundResource(R.drawable.nazakrashkrug);
-                dots[i].setAlpha(0.3f);
+                dots[i].setAlpha(1.0f);
             }
         }
     }
@@ -71,39 +78,41 @@ public class PasswordCode extends AppCompatActivity {
             updateDots();
         }
     }
+
     private void verifyPin() {
         String enteredPin = pinCode.toString();
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String savedPin = prefs.getString("user_pin", "");
 
         if (savedPin.isEmpty()) {
-            // Если пина еще нет — сохраняем его (первая установка)
             prefs.edit().putString("user_pin", enteredPin).apply();
-            proceedToDashboard();
+            checkTokenAndProceed();
         } else {
-            // Если пин есть — проверяем на совпадение
             if (enteredPin.equals(savedPin)) {
-                proceedToDashboard();
+                checkTokenAndProceed();
             } else {
                 Toast.makeText(this, "Неверный ПИН-код", Toast.LENGTH_SHORT).show();
-                pinCode.setLength(0); // Очищаем введенное
-                updateDots();         // Сбрасываем кружочки
+                pinCode.setLength(0);
+                updateDots();
             }
         }
     }
+
+    private void checkTokenAndProceed() {
+        if (userToken == null || userToken.isEmpty()) {
+            Toast.makeText(this, "Сессия истекла. Войдите заново", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, LogSignIn.class);
+            startActivity(intent);
+            finish();
+        } else {
+            proceedToDashboard();
+        }
+    }
+
     private void proceedToDashboard() {
-        // 1. Создаем намерение для перехода на главный экран
         Intent intent = new Intent(this, Primary.class);
-
-        // 2. Очищаем стек Activity.
-        // Это нужно, чтобы при нажатии кнопки "Назад" пользователь
-        // не вернулся на экран ввода ПИН-кода или логина.
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        // 3. Запускаем переход
         startActivity(intent);
-
-        // 4. Закрываем текущий экран ПИН-кода
         finish();
     }
 }
